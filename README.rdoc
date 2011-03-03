@@ -11,7 +11,6 @@ This gem adds pagination support to Active Resource.
   Article.paginate(:page => 2, :per_page => 20, :params => {:year => 2010})
 
 
-
 == Configuration
 
 To set default per_page value for all resources. you can do
@@ -33,3 +32,20 @@ When doing the pagination query, it converts :page and :per_page parameters to :
 * You can always override count() if default doesn't suit your need.
 * If you don't pass in the :total_entries parameter, Model.count() will be called, 
   unless result count > per_page, then this method automatically sets the count from the result.
+  
+
+== Other Details
+
+You can use a normal index action on the server side, but you will also need a custom show action to return the count if no results are found. No sure why yet, but this is a quick fix. Really it shouldn't be checking for a second count if the initial one returns nil.
+
+def show
+  @search = Sunspot.search(Some_search) do
+  
+  end.hits
+  
+  @count = {"count"=>@searchfiles.size} #returns 0 in most cases, I choose to research in case I am missing something.
+  
+  respond_to do |format|
+    format.xml { render :xml => @count }
+  end
+end  
